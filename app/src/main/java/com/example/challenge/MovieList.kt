@@ -64,56 +64,68 @@ fun MovieList(items: List<TmdbItem>) {
 }
 
 @Composable
-fun MainScreen(viewModel: TmdbViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        when {
-            viewModel.isLoading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
+fun MovieScreen(viewModel: TmdbViewModel) {
+    when {
+        viewModel.isLoading -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
             }
-
-            viewModel.errorMessage != null -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            imageVector = Icons.Default.Error,
-                            contentDescription = "Error",
-                            tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(48.dp)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = viewModel.errorMessage ?: "Unknown error",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
+        }
+        viewModel.errorMessage != null -> {
+            ErrorScreen(message = viewModel.errorMessage)
+        }
+        else -> {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    "Top Rated Movies",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                MovieList(viewModel.movies)
             }
+        }
+    }
+}
 
-            else -> {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "Top Rated Movies",
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    MovieList(viewModel.movies)
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    Text(
-                        "Top Rated TV Shows",
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    MovieList(viewModel.tvShows)
-                }
+@Composable
+fun TvSeriesScreen(viewModel: TmdbViewModel) {
+    when {
+        viewModel.isLoading -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
             }
+        }
+        viewModel.errorMessage != null -> {
+            ErrorScreen(message = viewModel.errorMessage)
+        }
+        else -> {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    "Top Rated TV Series",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                MovieList(viewModel.tvShows) // Reusing the same list component
+            }
+        }
+    }
+}
+
+@Composable
+fun ErrorScreen(message: String?) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Default.Error,
+                contentDescription = "Error",
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier.size(48.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = message ?: "Unknown error occurred",
+                color = MaterialTheme.colorScheme.error
+            )
         }
     }
 }
